@@ -1,0 +1,77 @@
+@startuml
+
+entity User {
+  *id
+  *username
+  *email
+  *password_hash
+  *created_at
+  *updated_at
+}
+
+entity House {
+  *id
+  *user_id
+  *address
+  *name
+  *created_at
+}
+
+entity Device {
+  *id
+  *house_id
+  *type_id
+  *serial_number
+  *status
+  *installed_at
+}
+
+entity DeviceType {
+  *id
+  *name
+  *description
+  *manufacturer
+}
+
+entity TelemetryData {
+  *id
+  *device_id
+  *timestamp
+  *value
+  *metric_type
+}
+
+entity Module {
+  *id
+  *house_id
+  *name
+  *conditions
+  *actions
+  *enabled
+}
+
+entity "Subscriptions" {
+  *id : integer
+  *user_id : integer
+  *plan : varchar
+  *start_date : date
+  *end_date : date
+}
+
+entity "Scenarios" {
+  *id : integer
+  *user_id : integer
+  *name : varchar
+  *description : text
+  *trigger : varchar
+  *action : varchar
+}
+
+User ||--o{ House : "имеет"
+User ||--o{ Subscriptions : "имеет"
+User ||--o{ Scenarios : "создает"
+House ||--o{ Device : "содержит"
+House ||--o{ Module : "имеет"
+DeviceType ||--o{ Device
+Device ||--o{ TelemetryData : "генерирует"
+@enduml

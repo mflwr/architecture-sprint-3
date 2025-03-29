@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Authentication Service" (Авторизация и регистрация пользователей)
+
+Container(auth_service, "Authentication Service", "Spring Boot", "Регистрация, авторизация и управление учетными записями пользователей")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка запросов на регистрацию, авторизацию и управление учетными записями")
+Component(auth_manager, "Authentication Manager", "Spring Security", "Обработка аутентификации и генерация JWT токенов")
+Component(user_registry, "User Registry", "Spring Data JPA", "Регистрация новых пользователей и управление данными учетных записей")
+Component(redis_cache, "Session Cache", "Spring Redis", "Кеширование активных сессий и токенов")
+
+Rel(api_handler, auth_manager, "Авторизация пользователей и генерация токенов", "HTTP")
+Rel(auth_manager, user_registry, "Проверка учетных данных и управление пользователями", "JPA")
+Rel(auth_manager, redis_cache, "Кеширование сессий и токенов для быстрого доступа", "Redis")
+
+Rel(api_handler, kafka, "Отправка событий связанных с пользователями", "Kafka")
+Rel(user_registry, users_db, "Запись данных пользователей в базу данных", "JDBC")
+Rel(redis_cache, redis, "Кеширование токенов и сессий пользователей", "Redis")
+
+Rel(log_service, logs_db, "Запись логов о событиях авторизации", "JDBC")
+
+@enduml

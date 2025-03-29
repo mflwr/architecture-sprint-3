@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Log Service" (Обработка и хранение логов событий системы)
+
+Container(log_service, "Log Service", "Spring Boot", "Обработка и хранение логов событий системы")
+
+Component(event_listener, "Event Listener", "Spring Kafka", "Слушает события из Kafka и передает их для логирования")
+Component(log_writer, "Log Writer", "Spring Data JPA", "Записывает события в базу данных журналов")
+Component(log_cache, "Log Cache", "Redis", "Кеширование последних логов для быстрого доступа")
+
+Rel(event_listener, log_writer, "Передача событий для записи в базу данных", "JPA")
+Rel(event_listener, log_cache, "Кеширование событий для быстрого доступа", "Redis")
+
+Rel(event_listener, kafka, "Чтение событий из Kafka", "Kafka")
+
+Rel(log_writer, logs_db, "Запись логов событий в базу данных", "JDBC")
+Rel(log_cache, redis, "Кеширование логов для быстрого доступа", "Redis")
+
+@enduml

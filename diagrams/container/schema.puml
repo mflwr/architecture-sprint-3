@@ -1,0 +1,74 @@
+@startuml
+!include <C4/C4_Container>
+
+title Контейнерная диаграмма системы "Тёплый дом"
+
+Person(user, "Пользователь", "Контролирует умный дом через веб или мобильное приложение")
+Person(support, "Техническая поддержка", "Настраивает оборудование и консультирует клиентов")
+Person(seller, "Производитель устройств", "Создаёт и регистрирует совместимые устройства в системе")
+
+System_Boundary(smart_home, "Платформа 'Тёплый дом'") {
+    Container(api_gateway_users, "User API Gateway", "Spring Boot", "Обрабатывает пользовательские и административные запросы")
+    Container(api_gateway_devices, "Device API Gateway", "Spring Boot", "Обслуживает подключение и управление оборудованием")
+
+    Container(auth_service, "Authentication Service", "Spring Boot", "Регистрация, авторизация, управление учетными записями")
+    Container(heating_service, "Heating Control", "Spring Boot", "Настройка и управление системой отопления")
+    Container(lighting_service, "Lighting Control", "Spring Boot", "Организация и автоматизация освещения")
+    Container(security_service, "Security Service", "Spring Boot", "Мониторинг и контроль охранных систем и видеонаблюдения")
+    Container(automation_service, "Automation Engine", "Spring Boot", "Настройка и выполнение сценариев автоматизации")
+    Container(notifications_service, "Notification Service", "Spring Boot", "Обработка и доставка push, email и SMS уведомлений")
+    Container(orchestrator_service, "Device Orchestrator", "Spring Boot", "Регистрация, контроль и мониторинг оборудования")
+    Container(payments_service, "Payment Service", "Spring Boot", "Обработка и управление подписками и платежами")
+    Container(log_service, "Log Service", "Spring Boot", "Обработка и хранение логов событий системы")
+
+    ContainerDb(users_db, "User Database", "PostgreSQL", "Хранение данных пользователей и их прав доступа")
+    ContainerDb(devices_db, "Device Database", "PostgreSQL", "Сохранение сведений о зарегистрированном оборудовании")
+    ContainerDb(logs_db, "Logs Database", "PostgreSQL", "Журналирование событий и действий в системе")
+    Container(kafka, "Kafka", "Apache Kafka", "Обеспечивает асинхронный обмен сообщениями между сервисами")
+    Container(redis, "Redis", "Redis", "Кеширует важные данные: сессии, сценарии, статусы устройств")
+}
+
+System_Ext(devices, "Умные устройства", "Датчики, камеры, реле — взаимодействуют через MQTT/HTTP/WebSocket")
+
+Rel(user, api_gateway_users, "Управление устройствами, просмотр информации")
+Rel(support, api_gateway_users, "Администрирование и помощь пользователям")
+Rel(seller, api_gateway_users, "Регистрация новых устройств в системе")
+
+Rel(api_gateway_users, auth_service, "Регистрация и авторизация пользователей")
+Rel(api_gateway_users, heating_service, "Настройка и контроль системы отопления")
+Rel(api_gateway_users, lighting_service, "Управление освещением")
+Rel(api_gateway_users, security_service, "Мониторинг охраны и видеонаблюдения")
+Rel(api_gateway_users, automation_service, "Создание и запуск автоматических сценариев")
+
+Rel(api_gateway_devices, orchestrator_service, "Управление подключением устройств")
+Rel(orchestrator_service, kafka, "Публикация событий об изменении состояния оборудования")
+Rel(heating_service, kafka, "Отправка данных о температуре и работе отопления")
+Rel(lighting_service, kafka, "Фиксация событий управления освещением")
+Rel(security_service, kafka, "Передача информации о тревогах и нарушениях")
+
+Rel(kafka, notifications_service, "Формирование и отправка уведомлений пользователям")
+Rel(kafka, auth_service, "Обработка событий, связанных с пользователями")
+Rel(kafka, log_service, "Чтение событий системы для логирования")
+
+Rel(heating_service, devices, "Обмен данными с датчиками температуры и отопительными приборами")
+Rel(lighting_service, devices, "Управление системой освещения")
+Rel(security_service, devices, "Контроль работы камер и охранных систем")
+
+Rel(payments_service, auth_service, "Проверка активных подписок и доступов")
+Rel(notifications_service, api_gateway_users, "Передача уведомлений клиентам")
+
+Rel(auth_service, users_db, "Хранение учетных данных и прав пользователей")
+Rel(orchestrator_service, devices_db, "Сохранение информации о подключенных устройствах")
+Rel(heating_service, devices_db, "Запись параметров системы отопления")
+Rel(lighting_service, devices_db, "Хранение настроек освещения")
+Rel(security_service, devices_db, "Сохранение конфигурации охранных систем")
+Rel(automation_service, devices_db, "Управление пользовательскими сценариями автоматизации")
+
+Rel(heating_service, redis, "Кеширование текущей температуры и состояний отопления")
+Rel(lighting_service, redis, "Быстрый доступ к статусу освещения")
+Rel(security_service, redis, "Кеширование информации об охранных системах")
+Rel(orchestrator_service, redis, "Оперативное хранение данных об устройствах")
+Rel(auth_service, redis, "Кеширование активных сессий и токенов аутентификации")
+
+Rel(log_service, logs_db, "Сохранение логов событий в базу данных")
+@enduml

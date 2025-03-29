@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Payment Service" (Платежный сервис)
+
+Container(payment_service, "Payment Service", "Spring Boot", "Обработка платежей и управление подписками")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка запросов, связанных с платежами и подписками")
+Component(payment_processor, "Payment Processor", "Spring Boot", "Обработка платежных транзакций через внешние шлюзы")
+Component(subscription_manager, "Subscription Manager", "Spring Boot", "Управление активными подписками пользователей")
+Component(db_interface, "Database Interface", "Spring Data JPA", "Взаимодействие с PostgreSQL для хранения информации о платежах и подписках")
+Component(kafka_producer, "Event Publisher", "Spring Kafka", "Публикация событий о платёжных транзакциях в Kafka")
+Component(payment_gateway_integration, "Payment Gateway Integration", "RESTful API", "Взаимодействие с внешними платёжными шлюзами (например, Stripe, PayPal)")
+
+Rel(api_handler, payment_processor, "Перенаправляет запросы на обработку транзакций", "HTTP API")
+Rel(payment_processor, payment_gateway_integration, "Взаимодействует с внешними платёжными шлюзами", "REST API")
+Rel(payment_processor, subscription_manager, "Передаёт информацию о платежах для активации подписки", "API")
+Rel(subscription_manager, db_interface, "Записывает данные о подписках и активации", "JDBC")
+Rel(payment_processor, kafka_producer, "Публикует события о платёжных транзакциях", "Kafka")
+Rel(subscription_manager, kafka_producer, "Отправляет события о статусе подписки", "Kafka")
+Rel(db_interface, users_db, "Чтение и запись информации о пользователях и их подписках", "JDBC")
+
+@enduml

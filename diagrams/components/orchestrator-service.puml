@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Device Orchestrator" (Операции с устройствами)
+
+Container(orchestrator_service, "Device Orchestrator", "Spring Boot", "Регистрация, контроль и мониторинг оборудования")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка запросов на управление и регистрацию устройств")
+Component(device_registry, "Device Registry", "Spring Data JPA", "Регистрация и управление данными о подключенных устройствах")
+Component(device_status, "Device Status Tracker", "Spring Boot", "Мониторинг и отслеживание состояния устройств")
+Component(kafka_producer, "Event Publisher", "Spring Kafka", "Публикация событий изменения состояния устройств в Kafka")
+Component(redis_cache, "Redis Cache", "Spring Redis", "Кеширование информации о состоянии и конфигурации устройств")
+
+Rel(api_handler, device_registry, "Регистрация новых устройств и управление ими", "HTTP")
+Rel(device_registry, device_status, "Передача информации о состоянии устройств", "HTTP")
+Rel(device_status, kafka_producer, "Публикация изменений состояния устройств в Kafka", "Kafka")
+Rel(device_status, redis_cache, "Кеширование состояния устройств для быстрого доступа", "Redis")
+Rel(api_handler, kafka_producer, "Отправка команд для устройства", "Kafka")
+
+Rel(api_handler, devices, "Регистрация устройств и запрос состояния через MQTT/HTTP/WebSocket", "MQTT/HTTP/WebSocket")
+Rel(device_registry, devices_db, "Сохранение данных об устройствах", "JDBC")
+Rel(kafka_producer, kafka, "Публикация сообщений о событиях в Kafka", "Kafka")
+Rel(redis_cache, redis, "Кеширование данных о подключенных устройствах", "Redis")
+Rel(log_service, logs_db, "Запись логов об операциях с устройствами", "JDBC")
+
+@enduml
