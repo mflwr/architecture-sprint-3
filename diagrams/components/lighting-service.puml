@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Lighting Control" (Управление освещением)
+
+Container(lighting_service, "Lighting Control Service", "Spring Boot", "Управление системой освещения в умном доме")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка входящих HTTP-запросов от пользователей")
+Component(light_control_manager, "Light Control Manager", "Spring Boot", "Основная логика управления состоянием света")
+Component(event_publisher, "Event Publisher", "Spring Kafka", "Публикация данных о состоянии освещения в Kafka")
+Component(db_interface, "Database Interface", "Spring Data JPA", "Взаимодействие с базой данных для сохранения и получения настроек")
+Component(device_comm, "Device Communication Layer", "Spring Integration", "Отправка команд управления на устройства")
+Component(redis_cache, "Redis Cache", "Spring Data Redis", "Кэширование часто запрашиваемых данных для быстрого доступа")
+
+Rel(api_handler, light_control_manager, "Перенаправляет запросы управления светом", "HTTP-запросы")
+Rel(light_control_manager, event_publisher, "Отправляет события об изменении состояния света", "Kafka")
+Rel(light_control_manager, device_comm, "Отправляет команды освещения", "MQTT/HTTP/WebSocket")
+Rel(light_control_manager, redis_cache, "Кэширует состояния и параметры освещения", "Redis")
+Rel(light_control_manager, db_interface, "Запрашивает/сохраняет данные об освещении", "JDBC")
+
+@enduml

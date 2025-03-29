@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+
+title Компонентная диаграмма сервиса "Security Service"
+
+Container(security_service, "Security Service", "Spring Boot", "Мониторинг и управление охранными системами")
+
+Component(http_api, "HTTPS API", "Spring Web", "Приём и обработка запросов от клиентов")
+Component(cache_layer, "Cache Layer", "Spring Data Redis", "Кэширование оперативных данных и статусов")
+Component(db_handler, "Database Handler", "Spring Data JPA", "Работа с базой данных PostgreSQL")
+Component(device_gateway, "Device Gateway", "Spring Integration", "Связь с охранными устройствами")
+Component(security_manager, "Security Manager", "Spring Boot", "Логика управления охранными устройствами и событиями")
+Component(event_publisher, "Event Publisher", "Spring Kafka", "Отправка событий тревог в Kafka")
+
+Rel(http_api, security_manager, "Передача команд и запросов", "REST API")
+Rel(security_manager, event_publisher, "Публикация событий тревог", "Kafka")
+Rel(security_manager, device_gateway, "Команды управления оборудованием", "MQTT/HTTP/WebSocket")
+Rel(security_manager, db_handler, "Чтение и сохранение данных", "JPA / SQL")
+Rel(security_manager, cache_layer, "Запись и извлечение кэшированных данных", "Redis")
+@enduml

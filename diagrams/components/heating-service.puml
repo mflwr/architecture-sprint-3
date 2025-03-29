@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Temperature Control Service" (Сервис управления отоплением)
+
+Container(heating_service, "Temperature Control Service", "Spring Boot", "Управление системой отопления и температурой в помещении")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка входящих HTTP-запросов и маршрутизация команд")
+Component(temp_management, "Temperature Management Engine", "Spring Boot", "Основная логика управления температурными настройками")
+Component(event_publisher, "Event Publisher", "Spring Kafka", "Отправка данных о температурных изменениях в Kafka")
+Component(redis_cache, "Redis Cache", "Spring Data Redis", "Кэширование часто используемых данных для ускоренного доступа")
+Component(device_comm_layer, "Device Communication Layer", "Spring Integration", "Передача команд на устройства отопления")
+Component(db_interface, "Database Interface", "Spring Data JPA", "Обмен данными с PostgreSQL для хранения настроек и сценариев")
+
+Rel(api_handler, temp_management, "Перенаправляет запросы на управление отоплением", "HTTP-запросы")
+Rel(temp_management, device_comm_layer, "Отправляет команды отопительным устройствам", "MQTT/HTTP/WebSocket")
+Rel(temp_management, db_interface, "Сохраняет/извлекает данные о настройках отопления", "JDBC")
+Rel(temp_management, redis_cache, "Кэширует параметры температуры и состояния системы", "Redis")
+Rel(temp_management, event_publisher, "Отправляет события о температуре", "Kafka")
+
+@enduml

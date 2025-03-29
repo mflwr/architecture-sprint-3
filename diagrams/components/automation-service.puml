@@ -1,0 +1,22 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Automation Engine" (Система автоматизации)
+
+Container(automation_service, "Automation Engine", "Spring Boot", "Настройка и выполнение сценариев автоматизации")
+
+Component(api_handler, "API Handler", "Spring Web", "Обработка запросов на создание и управление сценариями автоматизации")
+Component(scenario_executor, "Scenario Executor", "Spring Boot", "Выполнение автоматических сценариев в реальном времени")
+Component(scenario_scheduler, "Scenario Scheduler", "Spring Boot", "Запуск сценариев по расписанию или на основе событий")
+Component(db_adapter, "Database Adapter", "Spring Data JPA", "Взаимодействие с PostgreSQL для хранения сценариев и данных о выполнении")
+Component(kafka_producer, "Event Publisher", "Spring Kafka", "Публикация событий о выполнении сценариев в Kafka")
+
+Rel(api_handler, scenario_executor, "Запускает сценарии", "HTTP")
+Rel(scenario_executor, kafka_producer, "Публикует события выполнения сценариев", "Kafka")
+Rel(scenario_executor, db_adapter, "Записывает статус выполнения сценариев", "JDBC")
+Rel(scenario_scheduler, scenario_executor, "Отправляет команды на выполнение по расписанию", "HTTP")
+Rel(scenario_scheduler, db_adapter, "Записывает расписания сценариев", "JDBC")
+Rel(db_adapter, devices_db, "Чтение и запись сценариев автоматизации", "JDBC")
+Rel(scenario_executor, devices, "Взаимодействует с устройствами для выполнения сценариев", "MQTT/HTTP/WebSocket")
+
+@enduml

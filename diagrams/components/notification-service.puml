@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов микросервиса "Notification Service" (Уведомления)
+
+Container(notification_service, "Notification Service", "Spring Boot", "Обработка и отправка различных типов уведомлений пользователям")
+
+Component(kafka_event_listener, "Kafka Event Listener", "Spring Kafka", "Подключение к Kafka для получения событий")
+Component(notification_handler, "Notification Handler", "Spring Boot", "Определение и маршрутизация уведомлений")
+Component(email_service, "Email Service", "JavaMail", "Обработка и отправка email-уведомлений")
+Component(sms_service, "SMS Service", "SMS Service", "Отправка SMS-уведомлений")
+Component(push_service, "Push Service", "APNS, FCM", "Отправка push-уведомлений на мобильные устройства")
+Component(database_connector, "Database Connector", "Spring Data JPA", "Работа с базой данных для хранения настроек уведомлений")
+
+Rel(kafka_event_listener, notification_handler, "Получает события", "События из Kafka")
+Rel(notification_handler, email_service, "Отправляет email-уведомления", "SMTP")
+Rel(notification_handler, sms_service, "Отправляет SMS-уведомления", "API Twilio")
+Rel(notification_handler, push_service, "Отправляет push-уведомления", "Firebase API")
+Rel(notification_handler, database_connector, "Получает настройки уведомлений", "JDBC")
+
+@enduml

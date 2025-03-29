@@ -1,0 +1,25 @@
+@startuml
+!include <C4/C4_Component>
+
+title Диаграмма компонентов - Device Service
+
+Container_Boundary(device_service, "Device Service") {
+    Component(api, "Device API", "Spring Boot", "Принимает и обрабатывает HTTP-запросы")
+    Component(command_handler, "Command Handler", "Java", "Обрабатывает команды для устройств")
+    Component(state_manager, "State Manager", "Java", "Отслеживает и обновляет состояния устройств")
+    Component(device_connector, "Device Connector", "Java", "Связывается с физическими устройствами через MQTT/HTTP/WebSocket")
+    Component(event_publisher, "Event Publisher", "Kafka", "Публикует события об изменениях в устройствах")
+}
+
+Component(kafka, "Kafka", "Очередь сообщений для обмена событиями")
+Component(devices_db, "Devices DB", "PostgreSQL", "Хранит информацию о зарегистрированных устройствах")
+Component(redis, "Redis", "Кеширование активных данных")
+
+Rel(api, command_handler, "Передаёт команды для обработки")
+Rel(command_handler, device_connector, "Отправляет команды на устройства")
+Rel(device_connector, state_manager, "Обновляет состояние устройств")
+Rel(state_manager, event_publisher, "Публикует события об изменениях")
+Rel(event_publisher, kafka, "Отправляет события в очередь")
+Rel(state_manager, devices_db, "Сохраняет состояние устройств")
+Rel(state_manager, redis, "Обновляет кеш состояний устройств")
+@enduml
